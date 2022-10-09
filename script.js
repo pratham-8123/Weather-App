@@ -73,7 +73,7 @@ function  fetchData(){
     
 };
 
-
+let d;
 function weatherDetails(info){
 
 
@@ -87,6 +87,7 @@ function weatherDetails(info){
         const {description, id} = info.weather[0];
         const {temp, feels_like, humidity} = info.main;
         const {lat,lon}=info.coord;
+        // console.log(`${id} and ${description}`);
         // using custom weather icon according to the id which api gives to us
         if(id == 800){
             wIcon.src = "icons/clear.svg";
@@ -104,8 +105,9 @@ function weatherDetails(info){
         
         let date = new Date();
         currDate= `${date.getFullYear()}-${date.getMonth()+1}-`;
+        
         if(date.getDate()<10) currDate+= '0'+date.getDate();
-
+        d = currDate;
         alldates.add(currDate);
         document.getElementById('date').innerText= currDate;
 
@@ -147,7 +149,9 @@ function showForecast(info){
 // originalWeatherPart= weatherPart.cloneNode(true);
 
     for(var i in info.list){
-        currDate= info.list[i].dt_txt.split(' ')[0];
+        currDate = info.list[i].dt_txt.split(' ')[0];
+        console.log(`${currDate} and ${d}`);
+        if(currDate === d) continue;
         if(alldates.has(currDate)) continue;
         
         alldates.add(currDate);
@@ -156,7 +160,10 @@ function showForecast(info){
 
         // change data before appending
         const id = info.list[i].weather[0].id;
-        const {temp, feels_like, temp_min, temp_max} = info.list[i].main;
+        
+        const {temp, feels_like, temp_min, temp_max, humidity} = info.list[i].main;
+        const description = info.list[i].weather[0].description;
+        // console.log(`${id} and ${description}`);
         // using custom weather icon according to the id which api gives to us
         if(id == 800){
             wIcon.src = "icons/clear.svg";
@@ -173,10 +180,11 @@ function showForecast(info){
         }
         
         //passing a particular weather info.list[i] to a particular element
+        clonedWeather.querySelector(".weather").innerText = description;
         clonedWeather.querySelector("#date").innerText= currDate;
         clonedWeather.querySelector(".temp .numb").innerText = Math.floor(temp-273);
         clonedWeather.querySelector(".temp .numb-2").innerText = Math.floor(feels_like-273);
-        clonedWeather.querySelector(".humidity span").innerText = `${Math.floor(temp_min-273)} , ${Math.floor(temp_max-273)}`;
+        clonedWeather.querySelector(".humidity span").innerText = `${humidity}%`;
 
         weatherWrapper.appendChild(clonedWeather);
         console.log(`Date:${info.list[i].dt_txt} Temp-Min:${Math.floor(info.list[i].main.temp_min)-273} Temp-Max:${Math.floor(info.list[i].main.temp_max)-273}<br><br>`)
